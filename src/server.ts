@@ -1,0 +1,47 @@
+import { resolve } from "node:path";
+import express, {
+	type Request,
+	type Response,
+	type NextFunction,
+} from "express";
+import cookieParser from "cookie-parser";
+import { getAppName, getPresetType, initApi, initSSG, initSSR } from "./utils";
+
+const errorHandler = (
+	error: unknown,
+	req: Request,
+	res: Response,
+	next: NextFunction
+): void => {
+	if (res.headersSent) {
+		return;
+	}
+
+	console.error(error);
+	res.status(500).send("Internal server error");
+};
+
+export const server = async () => {
+	const appName = getAppName();
+	const frontendRoot = resolve(
+		import.meta.dirname,
+		`../../${appName}-frontend`
+	);
+	const { isCSRorSSG, isSSR } = await getPresetType(frontendRoot);
+
+	const app = express();
+
+	app.use(cookieParser());
+
+	initApi(app);
+
+	if (isCSRorSSG) {
+		initSSG(app, frontendRoot);
+	} else if (isSSR) {
+		await initSSR(app, frontendRoot);
+	}
+
+	app.use(errorHandler);
+
+	return app;
+};
