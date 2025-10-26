@@ -4,8 +4,7 @@ import express, {
 	type Response,
 	type NextFunction,
 } from "express";
-import cookieParser from "cookie-parser";
-import { getAppName, getPresetType, initApi, initSSG, initSSR } from "./utils";
+import { getAppName, getPresetType, initSSG, initSSR } from "./utils";
 
 const errorHandler = (
 	error: unknown,
@@ -29,11 +28,6 @@ export const server = async () => {
 	);
 
 	const app = express();
-
-	app.use(cookieParser());
-
-	// API
-	initApi(app);
 
 	// HTML pages
 	try {
