@@ -27,18 +27,27 @@ export const server = async () => {
 		import.meta.dirname,
 		`../../${appName}-frontend`
 	);
-	const { isCSRorSSG, isSSR } = await getPresetType(frontendRoot);
 
 	const app = express();
 
 	app.use(cookieParser());
 
+	// API
 	initApi(app);
 
-	if (isCSRorSSG) {
-		initSSG(app, frontendRoot);
-	} else if (isSSR) {
-		await initSSR(app, frontendRoot);
+	// HTML pages
+	try {
+		const { isCSRorSSG, isSSR } = await getPresetType(frontendRoot);
+
+		if (isCSRorSSG) {
+			initSSG(app, frontendRoot);
+		} else if (isSSR) {
+			await initSSR(app, frontendRoot);
+		}
+	} catch {
+		console.warn(
+			"Could not determine the frontend preset type. Server is started in API-only mode."
+		);
 	}
 
 	app.use(errorHandler);
