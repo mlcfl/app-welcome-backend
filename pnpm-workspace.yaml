@@ -1,0 +1,3 @@
+overrides:
+  '@shared/all': link:../../../shared/shared-all
+  '@shared/backend': link:../../../shared/shared-backend
