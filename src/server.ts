@@ -4,7 +4,8 @@ import express, {
 	type Response,
 	type NextFunction,
 } from "express";
-import { getAppName, getPresetType, initSSG, initSSR } from "./utils";
+import { getAppName, initHTMLPagesRender } from "@shared/backend";
+import packageJson from "../package.json" assert { type: "json" };
 
 const errorHandler = (
 	error: unknown,
@@ -21,7 +22,7 @@ const errorHandler = (
 };
 
 export const server = async () => {
-	const appName = getAppName();
+	const appName = getAppName(packageJson);
 	const frontendRoot = resolve(
 		import.meta.dirname,
 		`../../${appName}-frontend`
@@ -30,19 +31,7 @@ export const server = async () => {
 	const app = express();
 
 	// HTML pages
-	try {
-		const { isCSRorSSG, isSSR } = await getPresetType(frontendRoot);
-
-		if (isCSRorSSG) {
-			initSSG(app, frontendRoot);
-		} else if (isSSR) {
-			await initSSR(app, frontendRoot);
-		}
-	} catch {
-		console.warn(
-			"Could not determine the frontend preset type. Server is started in API-only mode."
-		);
-	}
+	await initHTMLPagesRender(app, frontendRoot);
 
 	app.use(errorHandler);
 
