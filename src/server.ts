@@ -1,11 +1,10 @@
 import { resolve } from "node:path";
-import express, {
-	type Request,
-	type Response,
-	type NextFunction,
-} from "express";
+import { NestFactory } from "@nestjs/core";
+import type { NestExpressApplication } from "@nestjs/platform-express";
+import type { Request, Response, NextFunction } from "express";
 import { getAppName, initHTMLPagesRender } from "@shared/backend";
 import packageJson from "../package.json" assert { type: "json" };
+import { AppModule } from "./app.module";
 
 const errorHandler = (
 	error: unknown,
@@ -28,12 +27,14 @@ export const server = async () => {
 		`../../${appName}-frontend`
 	);
 
-	const app = express();
+	const nestApp = await NestFactory.create<NestExpressApplication>(AppModule);
+	const expressApp = nestApp.getHttpAdapter().getInstance();
 
-	// HTML pages
-	await initHTMLPagesRender(app, frontendRoot);
+	await initHTMLPagesRender(expressApp, frontendRoot);
 
-	app.use(errorHandler);
+	await nestApp.init();
 
-	return app;
+	expressApp.use(errorHandler);
+
+	return expressApp;
 };
