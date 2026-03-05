@@ -1,4 +1,8 @@
-# Application Welcome (backend)
+# Welcome — Backend
+
+Backend part of the Welcome application. Welcome is a simple landing page that introduces the MLC project. It requires no authentication or any other preconditions — it is publicly accessible.
+
+The frontend is a statically generated site (SSG). This backend serves as the API layer and static file host for that site. It is built with NestJS and Express, and can run both standalone and embedded inside `entry-server`.
 
 ## Setup
 
@@ -8,25 +12,31 @@ pnpm install
 
 ## Development
 
-Dev server
+Start the dev server (uses `.env.development`):
 
 ```bash
 pnpm dev
 ```
 
-Build
+## Build
+
+Compile for production (uses `.env.production`):
 
 ```bash
 pnpm build
 ```
 
+Output goes to `dist/`.
+
 ## Production
 
-For standalone application
+Run the standalone server (uses `.env.production`):
 
 ```bash
 pnpm start
 ```
+
+> When running inside `entry-server`, the `start` script is not used — `entry-server` imports the app factory directly.
 
 ## License
 
